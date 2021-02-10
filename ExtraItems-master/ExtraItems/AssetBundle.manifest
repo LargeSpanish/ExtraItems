@@ -1,0 +1,7 @@
+ManifestFileVersion: 0
+CRC: 1532350072
+AssetBundleManifest:
+  AssetBundleInfos:
+    Info_0:
+      Name: donutmod
+      Dependencies: {}
