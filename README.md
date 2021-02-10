@@ -1,2 +1,5 @@
 # ExtraItems
-Using this to learn how to code. I will add WIPS and updates whenever I can.
+Going to use this repository to add little projects to help me learn how to code in C#.
+
+WIPS
+------
