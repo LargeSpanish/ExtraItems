@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Linq;
 using R2API;
+using R2API.Networking;
 using R2API.Utils;
 using R2API.AssetPlus;
 using RoR2;
@@ -22,68 +23,75 @@ namespace ExtraItems
     {
         public const string ModGuid = "com.LargeSpanish.ExtraItems"; //package name
         public const string ModName = "ExtraItems";
-        public const string ModVersion = "0.1.0";
-
-        internal static BepInEx.Logging.ManualLogSource ModLogger;
+        public const string ModVersion = "0.1.2";
 
         public static AssetBundle MainAssets;
+        internal static ManualLogSource ModLogger;
+
         public static Shader HopooShader = Resources.Load<Shader>("shaders/deferred/hgstandard");
         public static Shader IntersectionShader = Resources.Load<Shader>("shaders/fx/hgintersectioncloudremap");
-        public static Shader CloudRemapShader = Resources.Load<Shader>("shaders/fx/hgcloudremap");
+        public static Shader CloudRemapShader = Resources.Load<Shader>("shader/fx/hgcloudremap");
 
+        //Used to create a list of Items from the ItemBase class
         public List<ItemBase> Items = new List<ItemBase>();
+
         public List<EquipmentBase> Equipment = new List<EquipmentBase>();
 
         public static Dictionary<ItemBase, bool> ItemStatusDictionary = new Dictionary<ItemBase, bool>();
+
         public void Awake()
         {
-            using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("ExtraItems.donutmod"))
+            using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("ExtraItems.extraitem_assets"))
             {
                 MainAssets = AssetBundle.LoadFromStream(stream);
-                var provider = new AssetBundleResourcesProvider("@ExtraItems", MainAssets);
+                var provider = new AssetBundleResourcesProvider($"@{ModName}", MainAssets);
                 ResourcesAPI.AddProvider(provider);
             }
 
-            var materialAssets = MainAssets.LoadAllAssets<Material>();
-
+            //Item initialization
             var ItemTypes = Assembly.GetExecutingAssembly().GetTypes().Where(type => !type.IsAbstract && type.IsSubclassOf(typeof(ItemBase)));
-
-
-            ModLogger.LogInfo("------Items------");
-
             foreach (var itemType in ItemTypes)
             {
-                ItemBase item = (ItemBase)Activator.CreateInstance(itemType);
+                ItemBase item = (ItemBase)System.Activator.CreateInstance(itemType);
                 if (ValidateItem(item, Items))
                 {
                     item.Init(Config);
-
                     ModLogger.LogInfo("Item: " + item.ItemName + " Initialized!");
                 }
             }
 
+            //Material Shader Conversion
+            var materialAssets = MainAssets.LoadAllAssets<Material>();
+            ModLogger.LogInfo("Intersection Shader is: " + IntersectionShader);
 
-            ModLogger.LogInfo("---------------------------------");
-            ModLogger.LogInfo("Extra Items has been initialized");
-            ModLogger.LogInfo($"Items Enabled: {ItemStatusDictionary.Count}");
-            ModLogger.LogInfo("---------------------------------");         
+            foreach(Material material in materialAssets)
+            {
+                if (!material.shader.name.StartsWith("Fake")) { continue; }
+                switch (material.shader.name.ToLower())
+                {
+                    case ("fake ror/hopoo games/deferred/hgstandard"):
+                        material.shader = HopooShader;
+                        break;
+                    case ("fake ror/hopoo games/fx/hgcloud intersection remap"):
+                        material.shader = IntersectionShader;
+                        break;
+                    case ("fake ror/hopoo games/fx/hgcloud remap"):
+                        material.shader = CloudRemapShader;
+                        break;
+
+                }
             }
-        public bool ValidateItem(ItemBase item, List<ItemBase> itemList)
+        }
+         public bool ValidateItem(ItemBase item, List<ItemBase> itemList)
         {
-            var enabled = Config.Bind<bool>("Item:  " + item.ItemName, "Enable Item?", true, "Should this item be enabled?").Value;
-            var aiBlacklist = Config.Bind<bool>("Item: " + item.ItemName, "Blacklist item from bots?", false, "Stop AI from obtaining item").Value;
+            var enabled = Config.Bind<bool>("Item: " + item.ItemName, "Enable Item?", true, "Should this item appear in game?").Value;
 
             ItemStatusDictionary.Add(item, enabled);
-
             if (enabled)
             {
                 itemList.Add(item);
-                if (aiBlacklist)
-                {
-                    item.AIBlacklisted = true;
-                }
             }
             return enabled;
-        }
+         }
     }
 }
