@@ -3,3 +3,5 @@ Going to use this repository to add little projects to help me learn how to code
 
 WIPS
 ------
+
+|![](https://imgur.com/ItxiWq7) |
