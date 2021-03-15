@@ -5,4 +5,5 @@ Going to use this repository to add little projects to help me learn how to code
 ------
 The Oddity
 ----------
-![](https://i.imgur.com/ItxiWq7.png) Chance on hit to do `300` Choleterol damage ( `+100` damage per stack)
+                                      Chance on hit to do `300` Choleterol damage ( `+100` damage per stack)
+![](https://i.imgur.com/ItxiWq7.png)
