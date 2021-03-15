@@ -5,4 +5,4 @@ Going to use this repository to add little projects to help me learn how to code
 ------
 The Oddity
 ----------
-|![](https://i.imgur.com/ItxiWq7.png) |
+![](https://i.imgur.com/ItxiWq7.png) Chance on hit to do <style=cIsDamage>{DamageofMainProjectile}</style> <style=cIsDamage>Choleterol</style> damage <style=cstack>(+{AdditionalDamageOfMainProjectilePerStack}</style> per stack)
